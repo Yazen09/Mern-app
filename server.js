@@ -16,5 +16,14 @@ app.listen(PORT,error => {
 
 connectDB();
 
+ // cloudinary configuration 
+
+ 
+cloudinary.config({
+    cloud_name: process.env.cloud_name,
+    api_key: process.env.api_key,
+    api_secret: process.env.API_SECRET
+  });
+  
 
 

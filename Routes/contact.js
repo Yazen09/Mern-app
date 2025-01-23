@@ -7,21 +7,38 @@ const upload =require('../middlewres/multer.js')
 
 
 router.post("/add-contact", isAuth, upload.single('image'), async (req, res) => {
+    if (!req.body.name || !req.body.email || !req.body.phone) {
+        return res.status(400).send('Tous les champs sont requis: name, email, phone');
+    }
+
+    if (!req.file) {
+        return res.status(400).send('L\'image est requise');
+    }
+
     try {
+        // Upload de l'image sur Cloudinary
         const result = await cloudinary.uploader.upload(req.file.path);
+
+        // Création du contact avec l'URL de l'image téléchargée
         let newContact = new Contact({
             name: req.body.name,
             email: req.body.email,
             phone: req.body.phone,
-            profile_img: result.secure_url,
-            cloudinary_id: result.public_id,
+            profile_img: result.secure_url,   // URL de l'image
+            cloudinary_id: result.public_id,  // ID de l'image
         });
+
+        // Sauvegarde du contact dans la base de données
         await newContact.save();
-        res.status(200).send('Contact ajouté');
+
+        // Réponse avec succès
+        res.status(200).send('Contact ajouté avec succès');
     } catch (error) {
-        res.status(400).send(`Contact n'est pas ajouté: ${error.message}`);
+        console.error("Erreur complète lors de l'ajout du contact : ", error); // Affiche l'erreur complète
+        res.status(400).send(`Erreur lors de l'ajout du contact : ${error.message}`);
     }
 });
+
 
 
 router.get("/all-contact", async (req, res) => {
