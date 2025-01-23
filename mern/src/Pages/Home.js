@@ -1,11 +1,13 @@
-import React from 'react'
+import React from 'react';
+import ListContact from './ListContact';
 
 const Home = () => {
   return (
-    <div>
-      
+    <div className="container">
+      <h1>Contact Manager</h1>
+      <ListContact />
     </div>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;

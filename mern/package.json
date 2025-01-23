@@ -8,6 +8,7 @@
     "@mui/icons-material": "^6.4.1",
     "@mui/material": "^6.4.1",
     "@mui/styled-engine-sc": "^6.4.0",
+    "axios": "^1.7.9",
     "cra-template": "1.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -40,5 +41,5 @@
       "last 1 safari version"
     ]
   },
-  "proxy" : "http://localhost:2025/"
+  "proxy": "http://localhost:2025/"
 }
