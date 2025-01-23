@@ -1,29 +1,43 @@
-const express=require("express");
-const app=express();
-const connectDB =require('./config/connectDB');
-require("dotenv").config();
-const PORT=process.env.PORT
+const express = require('express');
+
+// 2 create istance
+
+const app = express();
+
+// 4 require dotenv
+
+app.use(express.json()) ;
+
+require("dotenv").config() ;
 
 
-// Create SERVER 
+//6 connect db
 
-app.listen(PORT,error => {
-    error ? console.error(`fail to connect,${error}`):
-    console.log(`server is running at ${PORT}`)
-})
+const connectDB = require("./config/connectDB");
+connectDB() ;
 
-// ConnectDB function
+// 7 create routes
 
-connectDB();
+app.use("/api/contact" , require("./routes/contact") )
 
- // cloudinary configuration 
+app.use("/api/user",require("./routes/user"))
 
+// cors
+
+var cors = require('cors')
  
-cloudinary.config({
-    cloud_name: process.env.cloud_name,
-    api_key: process.env.api_key,
-    api_secret: process.env.API_SECRET
-  });
-  
+app.use(cors())
+
+// 3 create port
+
+const PORT = process.env.PORT
+
+
+//5 create server
+
+app.listen(PORT , error=> {
+    error ? console.error(`fail to connect , ${error}`) : 
+    console.log(`Server is running at ${PORT}`)
+})
 
 

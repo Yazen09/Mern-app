@@ -1,9 +1,21 @@
-const express =require ('express');
-const {register,login} =require('../Controllers/user.js');
-const { registerValidator, loginValidator, Validation } = require ("../middlewres/Validator.js");
-const router=express.Router();
+const express = require('express');
+const { register, login, updateUserPassword } = require('../controllers/user');
+const isAuth = require('../middlewares/isAuth');
+const { registerValidator, validation, loginValidator } = require('../middlewares/Validator');
+
+const router = express.Router()
 
 
-router.post("/register",registerValidator(),Validation,register)
-router.post("/login",loginValidator(),Validation,login)
-module.exports=router;
+router.post("/register" ,registerValidator() , validation, register )
+
+router.post("/login" , loginValidator(),validation ,login)
+
+
+router.get("/current" ,isAuth ,(req,res)=> {
+    res.send(req.user)
+} )
+
+router.put("/updatepassword/:_id" , isAuth , updateUserPassword)
+
+
+module.exports = router

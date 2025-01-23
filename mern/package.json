@@ -41,5 +41,6 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:2025/"
+  
+  "REACT_APP_API_URL": "http://localhost:2025/api"
 }

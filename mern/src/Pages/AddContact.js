@@ -1,4 +1,3 @@
-// src/Pages/AddContact.js
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -8,7 +7,7 @@ const AddContact = () => {
     name: '',
     email: '',
     phone: '',
-    image: null,  // Nouveau champ pour l'image
+    image: null,
   });
 
   const navigate = useNavigate();
@@ -18,13 +17,13 @@ const AddContact = () => {
   };
 
   const handleFileChange = (e) => {
-    setContact({ ...contact, image: e.target.files[0] });  // Gestion de l'image
+    setContact({ ...contact, image: e.target.files[0] });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Vérification si tous les champs sont remplis
+    
     if (!contact.name || !contact.email || !contact.phone || !contact.image) {
       alert('Tous les champs sont requis.');
       return;
@@ -34,17 +33,17 @@ const AddContact = () => {
     formData.append('name', contact.name);
     formData.append('email', contact.email);
     formData.append('phone', contact.phone);
-    formData.append('image', contact.image);  // Ajout du fichier image
+    formData.append('image', contact.image); 
 
     try {
-      // Envoi de la requête POST avec les données du formulaire et l'image
+    
       await axios.post('http://localhost:2025/api/add-contact', formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',  // Spécifie le type de contenu
+          'Content-Type': 'multipart/form-data',
         },
       });
       alert('Contact ajouté avec succès !');
-      navigate('/contacts');  // Redirection vers la liste des contacts
+      navigate('/contacts');
     } catch (error) {
       console.error('Erreur lors de l\'ajout du contact', error);
       alert('Erreur lors de l\'ajout du contact');
@@ -93,7 +92,7 @@ const AddContact = () => {
           <input
             type="file"
             name="image"
-            onChange={handleFileChange}  // Gestion de l'image
+            onChange={handleFileChange}
             className="form-control"
             required
           />

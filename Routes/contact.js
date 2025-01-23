@@ -1,93 +1,84 @@
 const express = require('express');
-const isAuth = require('../middlewres/isAuth.js');
-const router = express.Router();
-const cloudinary = require('cloudinary').v2;
-const Contact = require('../Model/Contact.js')
-const upload =require('../middlewres/multer.js')
+const Contact = require("../Model/Contact")
+const cloudinary = require("../middlewares/cloudinary");
+const upload = require("../middlewares/multer");
+const isAuth = require('../middlewares/isAuth');
+const router = express.Router()
 
+// router.get('/test' , (req,res) =>{
+//     res.send("api is running")
+// })
 
-router.post("/add-contact", isAuth, upload.single('image'), async (req, res) => {
-    if (!req.body.name || !req.body.email || !req.body.phone) {
-        return res.status(400).send('Tous les champs sont requis: name, email, phone');
-    }
-
-    if (!req.file) {
-        return res.status(400).send('L\'image est requise');
-    }
-
+router.post("/add-contact" ,isAuth ,upload.single("image"), async(req,res) =>{
     try {
-        // Upload de l'image sur Cloudinary
         const result = await cloudinary.uploader.upload(req.file.path);
-
-        // Création du contact avec l'URL de l'image téléchargée
+        
         let newContact = new Contact({
             name: req.body.name,
-            email: req.body.email,
             phone: req.body.phone,
-            profile_img: result.secure_url,   // URL de l'image
-            cloudinary_id: result.public_id,  // ID de l'image
-        });
-
-        // Sauvegarde du contact dans la base de données
-        await newContact.save();
-
-        // Réponse avec succès
-        res.status(200).send('Contact ajouté avec succès');
+            email: req.body.email,
+            profile_img: result.secure_url,
+            cloudinary_id: result.public_id,
+          });
+        await newContact.save()
+        res.status(200).send({msg : "contact added successfully" , newContact})
     } catch (error) {
-        console.error("Erreur complète lors de l'ajout du contact : ", error); // Affiche l'erreur complète
-        res.status(400).send(`Erreur lors de l'ajout du contact : ${error.message}`);
+        res.status(400).send({ msg : "can not add this contact" , error})
     }
-});
+})
 
-
-
-router.get("/all-contact", async (req, res) => {
+router.get("/alluser" , async(req,res) => {
     try {
-        const contacts = await Contact.find();
-        res.status(200).json(contacts);
+        const listContacts = await Contact.find()
+        res.status(200).send({msg : "list contacts" , listContacts})
+
     } catch (error) {
-        res.status(400).send(`Erreur lors de la récupération des contacts: ${error.message}`);
+        res.status(400).send({msg : "can not get list" , error})
     }
-});
+})
 
-
-router.delete("/delete-contact/:id", async (req, res) => {
+router.delete("/:_id" , async(req,res) => {
     try {
-        const contact = await Contact.findById(req.params.id);
-        if (!contact) {
-            return res.status(404).send('Contact non trouvé');
-        }
+        let contact = await Contact.findById(req.params._id);
         await cloudinary.uploader.destroy(contact.cloudinary_id);
-        await contact.remove();
-        res.status(200).send('Contact supprimé');
+        await contact.deleteOne();
+        res.status(200).send({msg : "contact deleted"})
     } catch (error) {
-        res.status(400).send(`Erreur lors de la suppression du contact: ${error.message}`);
+        res.status(400).send({msg : "can not delete this contact" , error})
     }
-});
+})
 
-
-router.put("/update-contact/:id", upload.single('image'), async (req, res) => {
+router.put("/:_id" ,upload.single("image"), async (req, res) => {
     try {
-        let contact = await Contact.findById(req.params.id);
-        if (!contact) {
-            return res.status(404).send('Contact non trouvé');
-        }
-        let result;
-        if (req.file) {
-            await cloudinary.uploader.destroy(contact.cloudinary_id);
-            result = await cloudinary.uploader.upload(req.file.path);
-        }
+        let contact = await Contact.findById(req.params._id);
+        await cloudinary.uploader.destroy(contact.cloudinary_id);
+        const result = await cloudinary.uploader.upload(req.file.path);
         const data = {
             name: req.body.name || contact.name,
             email: req.body.email || contact.email,
             phone: req.body.phone || contact.phone,
-            profile_img: result ? result.secure_url : contact.profile_img,
-            cloudinary_id: result ? result.public_id : contact.cloudinary_id,
-        };
-        contact = await Contact.findByIdAndUpdate(req.params.id, data, { new: true });
-        res.status(200).json(contact);
+            profile_img: result.secure_url || contact.profile_img,
+            cloudinary_id: result.public_id || contact.cloudinary_id,
+          };
+          updatedContact = await Contact.findByIdAndUpdate(req.params._id, data, {
+            new: true
+          });
+        res.status(200).send({msg : "contact updated" , updatedContact})
     } catch (error) {
-        res.status(400).send(`Error while update: ${error.message}`);
+        res.status(400).send({msg : "can not update this contact" , error})
+
     }
-});
-module.exports = router;
+} )
+
+router.get("/:_id" , async (req,res) => {
+    try {
+        const contactToGet = await Contact.findOne({_id : req.params._id})
+        res.status(200).send({msg : 'Contact getted',contactToGet})
+    } catch (error) {
+        res.status(400).send({msg : "can not get this contact" , error})
+
+    }
+})
+
+
+module.exports = router
